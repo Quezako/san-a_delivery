@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         San-A IBS / FODMAP Checker
 // @namespace    http://tampermonkey.net/
-// @version      0.2.0
+// @version      0.2.1
 // @description  Analyse les produits San-A via une base locale FODMAP, détecte les ingrédients du nom et de la fiche, puis colore les cartes.
 // @author       Copilot
 // @match        https://netsuper.san-a.co.jp/shop/*
