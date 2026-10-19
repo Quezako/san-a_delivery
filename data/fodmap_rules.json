@@ -66,6 +66,14 @@
       "source": "monash"
     },
     {
+      "food_id": "gobo",
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "is_fodmap": false,
+      "confidence": "medium",
+      "source": "curated_local"
+    },
+    {
       "food_id": "asparagus",
       "fodmap_group": "fructan",
       "fodmap_level": "high",

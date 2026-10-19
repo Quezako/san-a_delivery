@@ -1,0 +1,17 @@
+{
+  "input_file": "import\\san-a-ibs-unknown-terms.json",
+  "reference_file": "D:\\01-Drive\\50-Dev\\san-a_delivery\\data\\fodmap_reference.json",
+  "reference_version": "v1",
+  "summary": {
+    "total_unknown_terms": 1,
+    "known_count": 0,
+    "missing_count": 1,
+    "merged_count": 0
+  },
+  "already_known": [],
+  "missing_terms": [
+    "生姜"
+  ],
+  "merged_terms": [],
+  "translations": []
+}

@@ -14,6 +14,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
+from fodmap_reference_lib import build_runtime_reference as build_runtime_reference_map, normalize_aliases
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 DATA_DIR.mkdir(exist_ok=True)
@@ -119,6 +121,16 @@ FOODS_TABLE: List[Dict[str, Any]] = [
         "labels_fr": ["poireau"],
         "notes": "Also frequently used in Japanese cooking as green onion / leek-like aromatics.",
         "source_refs": ["monash", "japan_local"],
+    },
+    {
+        "food_id": "gobo",
+        "canonical": "gobo",
+        "category": "vegetable",
+        "labels_ja": ["ごぼう", "牛蒡", "ゴボウ"],
+        "labels_en": ["burdock", "burdock root"],
+        "labels_fr": ["bardane", "racine de bardane"],
+        "notes": "Common Japanese root vegetable, often low in FODMAPs in standard portions.",
+        "source_refs": ["japan_local", "monash"],
     },
     {
         "food_id": "asparagus",
@@ -311,6 +323,7 @@ FODMAP_RULES: List[Dict[str, Any]] = [
     {"food_id": "onion", "fodmap_group": "fructan", "fodmap_level": "high", "is_fodmap": True, "confidence": "high", "source": "monash"},
     {"food_id": "shallot", "fodmap_group": "fructan", "fodmap_level": "high", "is_fodmap": True, "confidence": "high", "source": "monash"},
     {"food_id": "leek", "fodmap_group": "fructan", "fodmap_level": "high", "is_fodmap": True, "confidence": "medium", "source": "monash"},
+    {"food_id": "gobo", "fodmap_group": "none", "fodmap_level": "low", "is_fodmap": False, "confidence": "medium", "source": "curated_local"},
     {"food_id": "asparagus", "fodmap_group": "fructan", "fodmap_level": "high", "is_fodmap": True, "confidence": "medium", "source": "monash"},
     {"food_id": "wheat", "fodmap_group": "fructan", "fodmap_level": "high", "is_fodmap": True, "confidence": "high", "source": "monash"},
     {"food_id": "rye", "fodmap_group": "fructan", "fodmap_level": "high", "is_fodmap": True, "confidence": "medium", "source": "monash"},
@@ -332,47 +345,8 @@ FODMAP_RULES: List[Dict[str, Any]] = [
 ]
 
 
-def normalize_aliases(values: List[str]) -> List[str]:
-    normalized = []
-    seen = set()
-    for value in values:
-        cleaned = value.strip().lower()
-        if not cleaned:
-            continue
-        if cleaned not in seen:
-            seen.add(cleaned)
-            normalized.append(cleaned)
-    return normalized
-
-
 def build_runtime_reference() -> Dict[str, Dict[str, Any]]:
-    by_id = {item["food_id"]: item for item in FOODS_TABLE}
-    by_food_id = {item["food_id"]: item for item in FODMAP_RULES}
-
-    reference: Dict[str, Dict[str, Any]] = {}
-    for food_id, food in by_id.items():
-        rule = by_food_id.get(food_id, {})
-        alias_values = []
-        for key in ["labels_ja", "labels_en", "labels_fr"]:
-            alias_values.extend(food.get(key, []))
-        runtime_entry = {
-            "food_id": food_id,
-            "canonical": food["canonical"],
-            "category": food.get("category"),
-            "labels_ja": food.get("labels_ja", []),
-            "labels_en": food.get("labels_en", []),
-            "labels_fr": food.get("labels_fr", []),
-            "aliases": sorted(set(normalize_aliases(alias_values))),
-            "is_fodmap": bool(rule.get("is_fodmap", False)),
-            "fodmap_group": rule.get("fodmap_group", "unknown"),
-            "fodmap_level": rule.get("fodmap_level", "unknown"),
-            "confidence": rule.get("confidence", "low"),
-            "notes": food.get("notes", ""),
-            "source_refs": food.get("source_refs", []),
-            "source": rule.get("source", "curated_local"),
-        }
-        reference[food_id] = runtime_entry
-    return reference
+    return build_runtime_reference_map(FOODS_TABLE, FODMAP_RULES)
 
 
 def write_json(path: Path, payload: Any) -> None:

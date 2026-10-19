@@ -167,6 +167,29 @@
       ]
     },
     {
+      "food_id": "gobo",
+      "canonical": "gobo",
+      "category": "vegetable",
+      "labels_ja": [
+        "ごぼう",
+        "牛蒡",
+        "ゴボウ"
+      ],
+      "labels_en": [
+        "burdock",
+        "burdock root"
+      ],
+      "labels_fr": [
+        "bardane",
+        "racine de bardane"
+      ],
+      "notes": "Common Japanese root vegetable, often low in FODMAPs in standard portions.",
+      "source_refs": [
+        "japan_local",
+        "monash"
+      ]
+    },
+    {
       "food_id": "asparagus",
       "canonical": "asparagus",
       "category": "vegetable",
