@@ -5,6 +5,8 @@
 // @description  Analyse les produits San-A via une base locale FODMAP, détecte les ingrédients du nom et de la fiche, puis colore les cartes.
 // @author       Copilot
 // @match        https://netsuper.san-a.co.jp/shop/*
+// @updateURL    https://github.com/Quezako/san-a_delivery/raw/refs/heads/master/src/ibs-checker.user.js
+// @downloadURL  https://github.com/Quezako/san-a_delivery/raw/refs/heads/master/src/ibs-checker.user.js
 // @grant        none
 // @require      https://raw.githubusercontent.com/Quezako/san-a_delivery/refs/heads/master/src/fodmap_reference_embed.js
 // ==/UserScript==
@@ -13,8 +15,11 @@
   'use strict';
 
   const STORAGE_KEY = 'sanA_ibs_db_v1';
+  const UNKNOWN_TERMS_KEY = 'sanA_ibs_unknown_terms_v1';
+  const REFERENCE_VERSION_KEY = 'sanA_ibs_reference_version';
   const UI_ID = 'sanA-ibs-float-panel';
   const REFERENCE_DATA = (globalThis.SAN_A_FODMAP_REFERENCE && globalThis.SAN_A_FODMAP_REFERENCE.entries) || {};
+  const CURRENT_REFERENCE_VERSION = 'v1';
 
   const RISK_LEVEL_MAP = {
     high: 3,
@@ -53,10 +58,106 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
 
+  function readJsonKey(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (error) {
+      console.warn(`San-A IBS: impossible de lire la clé ${key}`, error);
+      return fallback;
+    }
+  }
+
+  function writeJsonKey(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
   function mergeProduct(itemCode, payload) {
     const db = readStorage();
     db[itemCode] = { ...db[itemCode], ...payload };
     writeStorage(db);
+  }
+
+  function getCurrentReferenceVersion() {
+    return readJsonKey(REFERENCE_VERSION_KEY, CURRENT_REFERENCE_VERSION);
+  }
+
+  function setCurrentReferenceVersion(version) {
+    writeJsonKey(REFERENCE_VERSION_KEY, version || CURRENT_REFERENCE_VERSION);
+  }
+
+  function getUnknownTerms() {
+    return readJsonKey(UNKNOWN_TERMS_KEY, []);
+  }
+
+  function saveUnknownTerms(terms) {
+    const uniqueTerms = Array.from(new Set((terms || []).map((term) => String(term).trim()).filter(Boolean)));
+    writeJsonKey(UNKNOWN_TERMS_KEY, uniqueTerms);
+  }
+
+  function extractIngredientCandidates(text) {
+    if (!text) return [];
+
+    const lines = String(text)
+      .replace(/【作り方】.*$/gi, '')
+      .replace(/【.*?】/g, '\n')
+      .split(/[\n\r]+/);
+
+    const candidates = [];
+
+    for (const line of lines) {
+      const clean = line
+        .replace(/[()（）\[\]{}<>.,!?:;"'’“”……]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (!clean) continue;
+
+      const firstToken = clean.split(/\s+/)[0];
+      if (firstToken && /[\p{Script=Hiragana}\p{Script=Katakana}\p{L}\p{N}]/u.test(firstToken)) {
+        candidates.push(firstToken);
+      }
+    }
+
+    return Array.from(new Set(candidates));
+  }
+
+  function collectUnknownTermsFromText(text) {
+    const knownAliases = new Set();
+    Object.values(REFERENCE_DATA).forEach((entry) => {
+      if (!entry || !entry.aliases) return;
+      (entry.aliases || []).forEach((alias) => {
+        const token = normalizeText(alias);
+        if (token) knownAliases.add(token);
+      });
+    });
+
+    const extracted = extractIngredientCandidates(text || '');
+    return extracted.filter((term) => {
+      const normalized = normalizeText(term);
+      return normalized && !knownAliases.has(normalized);
+    });
+  }
+
+  function recordUnknownTermsForProduct(itemCode, text) {
+    const terms = collectUnknownTermsFromText(text || '');
+    if (!terms.length) return [];
+
+    const existing = getUnknownTerms();
+    const merged = Array.from(new Set([...(existing || []), ...terms]));
+    saveUnknownTerms(merged);
+
+    const productCache = readStorage();
+    const current = productCache[itemCode] || {};
+    productCache[itemCode] = {
+      ...current,
+      item_code: itemCode,
+      unknown_terms: merged.filter((term) => terms.includes(term)),
+      updated_at: new Date().toISOString(),
+    };
+    writeStorage(productCache);
+
+    return terms;
   }
 
   function detectPageType() {
@@ -117,6 +218,26 @@
 
   function getRelevantPageText() {
     const pageType = detectPageType();
+
+    if (pageType === 'detail') {
+      const detailRoot = document.querySelector('.proditem-main');
+      if (detailRoot) {
+        const rawText = detailRoot.innerText || detailRoot.textContent || '';
+
+        const productDescriptionMatch = rawText.match(/商品説明[\s\S]*?(?=【作り方】|$)/i);
+        if (productDescriptionMatch) {
+          return productDescriptionMatch[0].replace(/^商品説明\s*/i, '').trim();
+        }
+
+        const productInfoMatch = rawText.match(/(?:材料|原材料|成分)[\s\S]*?(?=【作り方】|$)/i);
+        if (productInfoMatch) {
+          return productInfoMatch[0].trim();
+        }
+
+        return rawText.trim();
+      }
+    }
+
     const markers = ['材料', '原材料', '成分', '商品説明', 'ingredients', 'ingredient', 'composition', 'description'];
     const candidateNodes = Array.from(document.querySelectorAll('p, li, div, td, th, span, h2, h3'));
     const fragments = [];
@@ -134,7 +255,7 @@
     }
 
     const ingredientText = fragments.join('\n');
-    if (pageType === 'detail' && ingredientText) return ingredientText;
+    if (ingredientText) return ingredientText.split(/【作り方】/i)[0].trim();
     return document.body ? document.body.innerText : '';
   }
 
@@ -261,14 +382,20 @@
     const text = `${name}\n${detailText || ''}`;
     const result = analyzeTextForMatches(text);
 
-    persistAnalysis(itemCode, {
+    const record = {
+      item_code: itemCode,
       name,
+      ingredient_text: detailText || '',
       matches: result.matches,
       fodmap_level: result.fodmap_level,
       risk: result.risk,
       status: result.status,
       source: result.source,
-    });
+      updated_at: new Date().toISOString(),
+    };
+
+    persistAnalysis(itemCode, record);
+    recordUnknownTermsForProduct(itemCode, detailText || '');
 
     return { itemCode, result };
   }
@@ -291,7 +418,9 @@
     panel.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:6px;">
         <button data-action="export" style="padding:6px 8px; cursor:pointer;">Export JSON</button>
+        <button data-action="export-unknowns" style="padding:6px 8px; cursor:pointer;">Exporter inconnus</button>
         <button data-action="scan" style="padding:6px 8px; cursor:pointer;">Re-scan</button>
+        <button data-action="reanalyze-cache" style="padding:6px 8px; cursor:pointer;">Re-analyser cache</button>
         <button data-action="stats" style="padding:6px 8px; cursor:pointer;">Stats</button>
         <button data-action="clear" style="padding:6px 8px; cursor:pointer;">Vider base</button>
       </div>
@@ -314,6 +443,17 @@
         URL.revokeObjectURL(url);
       }
 
+      if (action === 'export-unknowns') {
+        const unknowns = getUnknownTerms();
+        const blob = new Blob([JSON.stringify({ reference_version: getCurrentReferenceVersion(), unknown_terms: unknowns }, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'san-a-ibs-unknown-terms.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
       if (action === 'scan') {
         analyzeCurrentProduct();
         getCardCandidates().forEach((card) => {
@@ -325,15 +465,37 @@
         });
       }
 
+      if (action === 'reanalyze-cache') {
+        const db = readStorage();
+        Object.entries(db).forEach(([itemCode, record]) => {
+          if (!record || !record.ingredient_text) return;
+          const outcome = inferCompatibilityFromText(record.ingredient_text || '');
+          db[itemCode] = {
+            ...record,
+            matches: outcome.matches,
+            fodmap_level: outcome.fodmap_level,
+            risk: outcome.risk,
+            status: outcome.status,
+            source: outcome.source,
+            updated_at: new Date().toISOString(),
+          };
+        });
+        writeStorage(db);
+        alert(`Cache recalculé : ${Object.keys(db).length} produits.`);
+      }
+
       if (action === 'stats') {
         const data = readStorage();
         const count = Object.keys(data).length;
-        alert(`Produits enregistrés : ${count}`);
+        const unknowns = getUnknownTerms();
+        alert(`Produits enregistrés : ${count}\nIngrédients inconnus : ${unknowns.length}`);
       }
 
       if (action === 'clear') {
         if (confirm('Vider la base locale IBS/FODMAP ?')) {
           localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(UNKNOWN_TERMS_KEY);
+          localStorage.removeItem(REFERENCE_VERSION_KEY);
         }
       }
     });
@@ -354,20 +516,26 @@
       const text = `${card.textContent || ''}`;
       const outcome = analyzeTextForMatches(text);
       applyCardColor(card, outcome);
-      persistAnalysis(hrefCode, {
+      const payload = {
+        item_code: hrefCode,
         name: card.textContent || '',
+        ingredient_text: text,
         matches: outcome.matches,
         fodmap_level: outcome.fodmap_level,
         risk: outcome.risk,
         status: outcome.status,
         source: outcome.source,
-      });
+        updated_at: new Date().toISOString(),
+      };
+      persistAnalysis(hrefCode, payload);
+      recordUnknownTermsForProduct(hrefCode, text);
     });
   }
 
   function init() {
     const pageType = detectPageType();
     console.log('San-A IBS: page type =', pageType);
+    setCurrentReferenceVersion(CURRENT_REFERENCE_VERSION);
 
     if (!document.body) return;
 

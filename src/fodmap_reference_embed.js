@@ -258,6 +258,43 @@ globalThis.SAN_A_FODMAP_REFERENCE = {
       ],
       "source": "monash"
     },
+    "gobo": {
+      "food_id": "gobo",
+      "canonical": "gobo",
+      "category": "vegetable",
+      "labels_ja": [
+        "ごぼう",
+        "牛蒡",
+        "ゴボウ"
+      ],
+      "labels_en": [
+        "burdock",
+        "burdock root"
+      ],
+      "labels_fr": [
+        "bardane",
+        "racine de bardane"
+      ],
+      "aliases": [
+        "bardane",
+        "burdock",
+        "burdockroot",
+        "racinedebardane",
+        "ごぼう",
+        "ゴボウ",
+        "牛蒡"
+      ],
+      "is_fodmap": false,
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "confidence": "medium",
+      "notes": "Common Japanese root vegetable, often low in FODMAPs in standard portions.",
+      "source_refs": [
+        "japan_local",
+        "monash"
+      ],
+      "source": "curated_local"
+    },
     "asparagus": {
       "food_id": "asparagus",
       "canonical": "asparagus",
@@ -831,6 +868,138 @@ globalThis.SAN_A_FODMAP_REFERENCE = {
         "japan_local"
       ],
       "source": "monash"
+    },
+    "salad_oil": {
+      "food_id": "salad_oil",
+      "canonical": "salad oil",
+      "category": "oil",
+      "labels_ja": [
+        "サラダ油",
+        "サラダオイル"
+      ],
+      "labels_en": [
+        "salad oil",
+        "vegetable oil"
+      ],
+      "labels_fr": [
+        "huile de salade",
+        "huile végétale"
+      ],
+      "aliases": [
+        "huile de salade",
+        "huile végétale",
+        "salad oil",
+        "vegetable oil",
+        "サラダオイル",
+        "サラダ油"
+      ],
+      "is_fodmap": false,
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "confidence": "medium",
+      "notes": "Cooking oil; generally low in FODMAPs in standard culinary use.",
+      "source_refs": [
+        "manual_enrichment"
+      ],
+      "source": "manual_enrichment"
+    },
+    "white_sesame": {
+      "food_id": "white_sesame",
+      "canonical": "white sesame",
+      "category": "seed",
+      "labels_ja": [
+        "白いりごま",
+        "白ごま"
+      ],
+      "labels_en": [
+        "white sesame",
+        "sesame seeds"
+      ],
+      "labels_fr": [
+        "sésame blanc",
+        "graines de sésame"
+      ],
+      "aliases": [
+        "graines de sésame",
+        "sesame seeds",
+        "sésame blanc",
+        "white sesame",
+        "白いりごま",
+        "白ごま"
+      ],
+      "is_fodmap": false,
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "confidence": "medium",
+      "notes": "Sesame seeds are generally tolerated in normal serving sizes.",
+      "source_refs": [
+        "manual_enrichment"
+      ],
+      "source": "manual_enrichment"
+    },
+    "ponzu_sauce": {
+      "food_id": "ponzu_sauce",
+      "canonical": "ponzu sauce",
+      "category": "sauce",
+      "labels_ja": [
+        "ポン酢醤油",
+        "ポン酢"
+      ],
+      "labels_en": [
+        "ponzu sauce",
+        "ponzu"
+      ],
+      "labels_fr": [
+        "sauce ponzu"
+      ],
+      "aliases": [
+        "ponzu",
+        "ponzu sauce",
+        "sauce ponzu",
+        "ポン酢",
+        "ポン酢醤油"
+      ],
+      "is_fodmap": false,
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "confidence": "medium",
+      "notes": "Often low FODMAP, but ingredient composition varies by brand.",
+      "source_refs": [
+        "manual_enrichment"
+      ],
+      "source": "manual_enrichment"
+    },
+    "sugar": {
+      "food_id": "sugar",
+      "canonical": "sugar",
+      "category": "sweetener",
+      "labels_ja": [
+        "砂糖",
+        "さとう"
+      ],
+      "labels_en": [
+        "sugar",
+        "sucrose"
+      ],
+      "labels_fr": [
+        "sucre"
+      ],
+      "aliases": [
+        "sucre",
+        "sucrose",
+        "sugar",
+        "さとう",
+        "砂糖"
+      ],
+      "is_fodmap": false,
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "confidence": "medium",
+      "notes": "Sugar is usually low FODMAP at culinary use levels.",
+      "source_refs": [
+        "manual_enrichment"
+      ],
+      "source": "manual_enrichment"
     }
   }
 };
