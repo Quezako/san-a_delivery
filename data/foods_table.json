@@ -1,0 +1,543 @@
+{
+  "schema": "foods_table_v1",
+  "entries": [
+    {
+      "food_id": "apple",
+      "canonical": "apple",
+      "category": "fruit",
+      "labels_ja": [
+        "リンゴ",
+        "りんご",
+        "アップル"
+      ],
+      "labels_en": [
+        "apple"
+      ],
+      "labels_fr": [
+        "pomme"
+      ],
+      "notes": "Common high-fructose fruit often flagged in IBS guidance.",
+      "source_refs": [
+        "monash",
+        "dariusk",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "pear",
+      "canonical": "pear",
+      "category": "fruit",
+      "labels_ja": [
+        "梨",
+        "なし"
+      ],
+      "labels_en": [
+        "pear"
+      ],
+      "labels_fr": [
+        "poire"
+      ],
+      "notes": "Often moderate to high in fructose depending on serving size.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "watermelon",
+      "canonical": "watermelon",
+      "category": "fruit",
+      "labels_ja": [
+        "スイカ",
+        "すいか"
+      ],
+      "labels_en": [
+        "watermelon"
+      ],
+      "labels_fr": [
+        "pastèque"
+      ],
+      "notes": "High-FODMAP fruit in many IBS guides.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "mango",
+      "canonical": "mango",
+      "category": "fruit",
+      "labels_ja": [
+        "マンゴー",
+        "まんごー"
+      ],
+      "labels_en": [
+        "mango"
+      ],
+      "labels_fr": [
+        "mangue"
+      ],
+      "notes": "Fructose-rich fruit; often grouped with trigger fruits.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "garlic",
+      "canonical": "garlic",
+      "category": "vegetable",
+      "labels_ja": [
+        "にんにく",
+        "ニンニク"
+      ],
+      "labels_en": [
+        "garlic"
+      ],
+      "labels_fr": [
+        "ail"
+      ],
+      "notes": "Common high-fructan ingredient in Japanese and Asian dishes.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "onion",
+      "canonical": "onion",
+      "category": "vegetable",
+      "labels_ja": [
+        "玉ねぎ",
+        "たまねぎ",
+        "オニオン"
+      ],
+      "labels_en": [
+        "onion"
+      ],
+      "labels_fr": [
+        "oignon"
+      ],
+      "notes": "Very common trigger ingredient.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "shallot",
+      "canonical": "shallot",
+      "category": "vegetable",
+      "labels_ja": [
+        "エシャロット",
+        "えしゃろっと"
+      ],
+      "labels_en": [
+        "shallot"
+      ],
+      "labels_fr": [
+        "échalote"
+      ],
+      "notes": "Fructan-rich allium.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "leek",
+      "canonical": "leek",
+      "category": "vegetable",
+      "labels_ja": [
+        "ネギ",
+        "ねぎ",
+        "リーク"
+      ],
+      "labels_en": [
+        "leek",
+        "green onion"
+      ],
+      "labels_fr": [
+        "poireau"
+      ],
+      "notes": "Also frequently used in Japanese cooking as green onion / leek-like aromatics.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "asparagus",
+      "canonical": "asparagus",
+      "category": "vegetable",
+      "labels_ja": [
+        "アスパラガス",
+        " asparagus "
+      ],
+      "labels_en": [
+        "asparagus"
+      ],
+      "labels_fr": [
+        "asperge"
+      ],
+      "notes": "Common fructan-containing vegetable.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "wheat",
+      "canonical": "wheat",
+      "category": "grain",
+      "labels_ja": [
+        "小麦",
+        "こむぎ",
+        "パン",
+        "小麦粉"
+      ],
+      "labels_en": [
+        "wheat",
+        "wheat flour"
+      ],
+      "labels_fr": [
+        "blé"
+      ],
+      "notes": "Classical fructan source in many food products.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "rye",
+      "canonical": "rye",
+      "category": "grain",
+      "labels_ja": [
+        "ライ麦",
+        "らいばく"
+      ],
+      "labels_en": [
+        "rye"
+      ],
+      "labels_fr": [
+        "seigle"
+      ],
+      "notes": "Fructan-rich grain.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "barley",
+      "canonical": "barley",
+      "category": "grain",
+      "labels_ja": [
+        "大麦",
+        "おおむぎ"
+      ],
+      "labels_en": [
+        "barley"
+      ],
+      "labels_fr": [
+        "orge"
+      ],
+      "notes": "Fructan-rich grain often included in cereals and soups.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "milk",
+      "canonical": "milk",
+      "category": "dairy",
+      "labels_ja": [
+        "牛乳",
+        "ぎゅうにゅう",
+        "ミルク"
+      ],
+      "labels_en": [
+        "milk"
+      ],
+      "labels_fr": [
+        "lait"
+      ],
+      "notes": "Lactose-containing dairy product.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "yogurt",
+      "canonical": "yogurt",
+      "category": "dairy",
+      "labels_ja": [
+        "ヨーグルト",
+        "yogurt"
+      ],
+      "labels_en": [
+        "yogurt"
+      ],
+      "labels_fr": [
+        "yaourt"
+      ],
+      "notes": "Often problematic due to lactose.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "soft_cheese",
+      "canonical": "soft_cheese",
+      "category": "dairy",
+      "labels_ja": [
+        "軟 cheese",
+        "ソフトチーズ",
+        "soft cheese"
+      ],
+      "labels_en": [
+        "soft cheese"
+      ],
+      "labels_fr": [
+        "fromage frais",
+        "fromage à pâte molle"
+      ],
+      "notes": "Lactose can be elevated in soft cheeses.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "chickpea",
+      "canonical": "chickpea",
+      "category": "legume",
+      "labels_ja": [
+        "ひよこ豆",
+        "ひよこまめ",
+        " chickpea "
+      ],
+      "labels_en": [
+        "chickpea"
+      ],
+      "labels_fr": [
+        "pois chiche"
+      ],
+      "notes": "Classic GOS-rich legume.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "lentil",
+      "canonical": "lentil",
+      "category": "legume",
+      "labels_ja": [
+        "レンズ豆",
+        "レンズマメ",
+        " lentil "
+      ],
+      "labels_en": [
+        "lentil"
+      ],
+      "labels_fr": [
+        "lentille"
+      ],
+      "notes": "GOS-rich legume.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "beans",
+      "canonical": "beans",
+      "category": "legume",
+      "labels_ja": [
+        "豆",
+        "まめ",
+        "beans"
+      ],
+      "labels_en": [
+        "beans",
+        "beans and legumes"
+      ],
+      "labels_fr": [
+        "haricots",
+        "légumineuses"
+      ],
+      "notes": "Broad group often rich in GOS when not well tolerated.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "cauliflower",
+      "canonical": "cauliflower",
+      "category": "vegetable",
+      "labels_ja": [
+        "カリフラワー",
+        " cauli "
+      ],
+      "labels_en": [
+        "cauliflower"
+      ],
+      "labels_fr": [
+        "chou-fleur"
+      ],
+      "notes": "Often moderate in FODMAPs depending on serving size.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "mushroom",
+      "canonical": "mushroom",
+      "category": "vegetable",
+      "labels_ja": [
+        "きのこ",
+        "キノコ",
+        "mushroom"
+      ],
+      "labels_en": [
+        "mushroom"
+      ],
+      "labels_fr": [
+        "champignon"
+      ],
+      "notes": "Generally lower FODMAP but can vary by species.",
+      "source_refs": [
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "rice",
+      "canonical": "rice",
+      "category": "grain",
+      "labels_ja": [
+        "米",
+        "こめ",
+        "ライス"
+      ],
+      "labels_en": [
+        "rice"
+      ],
+      "labels_fr": [
+        "riz"
+      ],
+      "notes": "Generally low FODMAP staple in many IBS patterns.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "potato",
+      "canonical": "potato",
+      "category": "vegetable",
+      "labels_ja": [
+        "じゃがいも",
+        "ジャガイモ",
+        " potato "
+      ],
+      "labels_en": [
+        "potato"
+      ],
+      "labels_fr": [
+        "pomme de terre"
+      ],
+      "notes": "Generally low FODMAP in standard servings.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "tomato",
+      "canonical": "tomato",
+      "category": "vegetable",
+      "labels_ja": [
+        "トマト",
+        " tomato "
+      ],
+      "labels_en": [
+        "tomato"
+      ],
+      "labels_fr": [
+        "tomate"
+      ],
+      "notes": "Often low-FODMAP in moderate portions.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "spinach",
+      "canonical": "spinach",
+      "category": "vegetable",
+      "labels_ja": [
+        "ほうれん草",
+        "ホウレンソウ"
+      ],
+      "labels_en": [
+        "spinach"
+      ],
+      "labels_fr": [
+        "épinard"
+      ],
+      "notes": "Generally low FODMAP in moderate portions.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "banana",
+      "canonical": "banana",
+      "category": "fruit",
+      "labels_ja": [
+        "バナナ",
+        " banana "
+      ],
+      "labels_en": [
+        "banana"
+      ],
+      "labels_fr": [
+        "banane"
+      ],
+      "notes": "Often treated as low FODMAP depending on ripeness.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    },
+    {
+      "food_id": "kiwi",
+      "canonical": "kiwi",
+      "category": "fruit",
+      "labels_ja": [
+        "キウイ",
+        "きうい"
+      ],
+      "labels_en": [
+        "kiwi"
+      ],
+      "labels_fr": [
+        "kiwi"
+      ],
+      "notes": "Often low FODMAP in moderate servings.",
+      "source_refs": [
+        "monash",
+        "japan_local"
+      ]
+    }
+  ]
+}

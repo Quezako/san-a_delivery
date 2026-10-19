@@ -3,8 +3,10 @@
 ## 1. Contexte
 
 Le besoin est de repérer rapidement si un produit San-A est potentiellement compatible avec un régime IBS ou pauvre en FODMAP, en analysant :
-- le nom du produit ;
-- éventuellement la fiche détaillée du produit ;
+- le nom du produit en japonais ;
+- la fiche détaillée du produit ;
+- les ingrédients et libellés contenus dans la page ;
+- une base de référence FODMAP commune et adaptée au Japon ;
 - les données déjà collectées dans le navigateur.
 
 Le site San-A est accessible via plusieurs pages de navigation, dont :
@@ -12,79 +14,147 @@ Le site San-A est accessible via plusieurs pages de navigation, dont :
 - fiche détaillée du produit ;
 - magasin sélectionné.
 
-Le script doit permettre une analyse rapide sans dépendre d'un backend externe ni du cache du navigateur.
+Le script doit permettre une analyse rapide sans dépendre d'un backend externe ni du cache navigateur.
 
 ## 2. Objectif fonctionnel
 
 Le userscript doit :
 - détecter automatiquement le type de page ;
-- extraire `item_code` et nom du produit ;
-- si disponible, lire les informations détaillées de la fiche ;
-- comparer avec une base locale de données IBS/FODMAP ;
+- extraire `item_code`, le nom produit et, si possible, les ingrédients ;
+- valider l'information à partir d'une base de référence FODMAP locale ;
+- afficher les composants problématiques avec traduction en anglais / français ;
 - colorer la carte produit selon la compatibilité ;
 - permettre un export JSON des résultats.
 
 ## 3. Données à traiter
 
-### 3.1. Product ID
+### 3.1. Identifiant produit
 
 Le point d'ancrage principal est `item_code`.
 
 Exemple :
 - `item_code = 0000000000222`
 
-Cela permet de faire un index unique pour chaque produit et de conserver les données localement dans le navigateur.
+Cela permet d'indexer uniquements les produits et de tenir un cache local fiable.
 
-### 3.2. Données métier
+### 3.2. Données métier du produit
 
 Pour chaque produit, on stocke :
-- `is_fodmap` : booléen
-- `fodmap_type` : type de FODMAP (`fructose`, `fructan`, `polyol`, `lactose`, `galacto-oligosaccharides`, etc.)
-- `fodmap_quantity` : `low`, `moderate`, `high`, `unknown`
-- `source` : manière de collecte (`manual`, `detail-page`, `name-analysis`, `import`)
+- `item_code`
+- `name_ja`
+- `ingredient_hits[]`
+- `status` : `low`, `moderate`, `high`, `unknown`
+- `risk` : `safe`, `watch`, `avoid`, `unknown`
+- `fodmap_group` : `fructose`, `fructan`, `lactose`, `polyol`, `gos`, `unknown`
+- `fodmap_level` : `low`, `moderate`, `high`, `unknown`
+- `source` : `manual`, `detail-page`, `name-analysis`, `reference-match`, `import`
 - `confidence` : `high`, `medium`, `low`
 - `updated_at` : horodatage
 
-## 4. Base locale de compatibilité
+### 3.3. Données de référence FODMAP
 
-### 4.1. Stockage navigateur
+La base de référence contient les aliments et ingrédients les plus courants au Japon :
+- fruits : pomme, poire, mangue, pastèque, etc.
+- légumes : oignon, ail, poireau, asperge, etc.
+- produits laitiers : lait, crème, yaourt, fromage
+- céréales et féculents : blé, orge, seigle, etc.
+- produits de base du quotidien : miso, soja, edamame, etc.
 
-Le stockage devra être durable dans le navigateur et ne pas dépendre du cache.
+Il faut aussi inclure les appellations japonaises et leurs traductions en anglais / français.
 
-Options recommandées :
-- `localStorage` pour simplicité et rapidité ;
-- `IndexedDB` si on prévoit un volume plus important.
+## 4. Stockage local recommandé
 
-Pour une première version, `localStorage` est suffisant :
+### 4.1. Pourquoi IndexedDB
 
-```js
-const STORAGE_KEY = 'sanA_ibs_db_v1';
-```
+Pour des centaines, voire des milliers de produits, `localStorage` devient limité et peu adapté.
 
-Le JSON obtenu peut ressembler à :
+Le meilleur choix pour un tel projet est :
+- IndexedDB pour les données persistantes ;
+- JSON exportable pour sauvegarde et transfert ;
+- `localStorage` uniquement pour quelques flags de configuration légères.
+
+### 4.2. Structure recommandée
+
+Stores proposés :
+- `reference` : base FODMAP, pré-générée et embarquée ;
+- `products` : cache produits San-A lus dans le navigateur ;
+- `analysis` : résultats IBS/FODMAP par `item_code` ;
+- `manual` : corrections utilisateur / validation manuelle.
+
+### 4.3. Exemple de stockage produit
 
 ```json
 {
   "0000000000222": {
-    "is_fodmap": true,
-    "fodmap_type": "fructan",
-    "fodmap_quantity": "moderate",
-    "source": "manual"
+    "item_code": "0000000000222",
+    "name_ja": "おやつごぼう",
+    "ingredient_hits": [
+      {
+        "ingredient": "garlic",
+        "label_ja": "にんにく",
+        "label_en": "garlic",
+        "label_fr": "ail",
+        "fodmap_group": "fructan",
+        "fodmap_level": "high"
+      }
+    ],
+    "status": "high",
+    "risk": "avoid",
+    "updated_at": "2026-10-19T00:00:00Z"
   }
 }
 ```
 
-### 4.2. Rôle de la base locale
+## 5. Base de référence FODMAP au Japon
 
-La base locale permet :
-- de mémoriser les produits déjà analysés ;
-- de réutiliser les résultats d'une session à l'autre ;
-- de pousser la donnée à export / import ;
-- de tenir un historique propre aux données IBS/FODMAP.
+### 5.1. Principe
 
-## 5. Détection des pages
+La base locale doit être une liste exhaustive des aliments et ingrédients connus comme potentiellement problématiques pour les IBS / FODMAP.
 
-### 5.1. Pages supportées
+Elle doit être adaptée au contexte japonais et contenir :
+- noms japonais usuels ;
+- variantes de translittération ;
+- noms anglais / français ;
+- type FODMAP principal ;
+- niveau d'impact probable ;
+- remarques de contexte (par exemple, "écrit en sauce, souvent plus élevé" etc.).
+
+### 5.2. Exemple de structure de référence
+
+```json
+{
+  "apple": {
+    "canonical": "apple",
+    "labels_ja": ["リンゴ", "りんご", "アップル"],
+    "labels_en": ["apple"],
+    "labels_fr": ["pomme"],
+    "fodmap_group": "fructose",
+    "fodmap_level": "high",
+    "source": "reference-base"
+  },
+  "garlic": {
+    "canonical": "garlic",
+    "labels_ja": ["にんにく", "ニンニク"],
+    "labels_en": ["garlic"],
+    "labels_fr": ["ail"],
+    "fodmap_group": "fructan",
+    "fodmap_level": "high",
+    "source": "reference-base"
+  }
+}
+```
+
+### 5.3. Plan de construction
+
+1. Lister les aliments les plus courants au Japon en supermarché.
+2. Ajouter les variantes japonaises communes (Kana, kanji, translitération).
+3. Associer chaque aliment à un groupe FODMAP.
+4. Ajouter les formes de préparation et les ingrédients communs : sauces, épices, condiments, garnitures.
+5. Produire un fichier JSON/CSV embarqué dans le dépôt.
+
+## 6. Détection des pages
+
+### 6.1. Pages supportées
 
 - `list.php` : liste des produits d'une catégorie
 - `detail.php` : fiche détaillée du produit
@@ -93,7 +163,7 @@ La base locale permet :
 Exemple de magasin ciblé :
 - `https://netsuper.san-a.co.jp/shop/storetour_entry.php?shop_code=SNA_006`
 
-### 5.2. Détection du contexte
+### 6.2. Détection du contexte
 
 Le script doit déterminer le contexte pour appliquer les bons extracteurs :
 
@@ -103,97 +173,82 @@ const pageType = location.pathname.includes('detail.php') ? 'detail'
   : 'other';
 ```
 
-## 6. Extraction des informations
+## 7. Extraction des informations
 
-### 6.1. Sur les listes
+### 7.1. Sur les listes
 
-Les éléments de liste peuvent être des cartes de produits avec :
+Les éléments de liste peuvent contenir :
 - nom du produit ;
 - image ;
 - prix ;
 - lien vers fiche détaillée ;
-- `item_code` ou un identifiant accessible dans le `href`.
+- `item_code` ou un identifiant accessible dans l'URL.
 
-Règle : extraire le `item_code` dès que possible depuis le `href`, le dataset ou un attribut HTML.
+Règle : extraire `item_code` depuis le `href`, le dataset ou un attribut HTML.
 
-### 6.2. Sur les fiches détaillées
+### 7.2. Sur les fiches détaillées
 
 La fiche contient généralement :
 - nom du produit ;
 - code article ;
-- attributs nutritionnels ;
 - description ;
+- ingrédients ;
+- information nutritionnelle ;
 - points de vente.
 
-Le système doit dans un premier temps chercher dans le HTML :
+Le système doit chercher dans le HTML :
 - `item_code`
 - `group_code`
 - `name`
 - `title`
 - `meta[name=description]`
-- balises de détails produites par le site.
+- balises d'ingrédients / nutrition / détails
 
-## 7. Logique de compatibilité IBS/FODMAP
+## 8. Logique de compatibilité IBS/FODMAP
 
-### 7.1. Analyse du nom
+### 8.1. Analyse du nom et des ingrédients
 
-Le nom du produit permet souvent d'identifier des familles de produits :
-- orange
-- pomme
-- poire
-- ail
-- oignon
-- blé
-- lait
-- fromage
-- soja
-- pois chiche
-- etc.
+Le nom du produit est souvent insuffisant. Il faut donc combiner :
+- le nom produit ;
+- les éléments visibles dans la page ;
+- les ingrédients si présents ;
+- la base de référence FODMAP locale.
 
-L'algorithme peut utiliser :
-- normalisation lowercase ;
-- trimming ;
-- suppression des accents ;
-- tokeniser les mots-clés.
+### 8.2. Moteur de matching
 
-### 7.2. Analyse de la fiche détaillée
+Le matching doit fonctionner sur des séquences comme :
+- `りんご`, `リンゴ`, `apple`, `pomme`
+- `にんにく`, `ニンニク`, `garlic`, `ail`
+- `ネギ`, `onion`, `oignon`
+- `大根`, `daikon`, `radis`
 
-Si la fiche contient des descriptions ou attributs nutritionnels, le parser doit extraire :
-- ingrédients ;
-- informations nutritionnelles ;
-- catégorie / type de produit ;
-- mots-clés utiles.
+Et utiliser des alias pour éviter de rater les variantes de langue.
 
-### 7.3. Règle d'évaluation
+### 8.3. Règle d'évaluation
 
-Exemple de logique simple :
+Exemple :
 
 ```js
 function scoreProduct(product) {
-  const tokens = extractTokens(product.name + ' ' + product.detailText);
+  const matches = findMatchingIngredients(product.nameJa, product.ingredients, referenceDb);
 
-  if (tokens.includes('oignon') || tokens.includes('ail')) return 'high';
-  if (tokens.includes('pomme') || tokens.includes('poire')) return 'moderate';
-  if (tokens.includes('lait') || tokens.includes('fromage')) return 'moderate';
-  return 'unknown';
+  if (matches.some(m => m.fodmap_level === 'high')) return 'high';
+  if (matches.some(m => m.fodmap_level === 'moderate')) return 'moderate';
+  if (matches.length === 0) return 'unknown';
+  return 'low';
 }
 ```
 
-Ensuite :
-- `high` => `is_fodmap = true`, `fodmap_type = 'fructan'` ou autre
-- `moderate` => `is_fodmap = true`, `fodmap_quantity = 'moderate'`
-- `unknown` => `is_fodmap = false`/`null` selon l'état de la donnée
+## 9. Couleur de fond sur la carte produit
 
-## 8. Couleur de fond sur la carte produit
+### 9.1. Règles proposées
 
-### 8.1. Règles proposées
+- vert : compatible / faible FODMAP
+- orange : modéré / attention
+- rouge : fort / à éviter
+- gris : inconnu
 
-- vert : compatibilité forte / faible FODMAP
-- orange : attention, modéré
-- rouge : à éviter pour IBS
-- gris : non évalué
-
-### 8.2. Exemple
+### 9.2. Exemple
 
 ```js
 const palette = {
@@ -206,40 +261,74 @@ const palette = {
 
 Le composant devra :
 - trouver le conteneur de carte produit ;
-- ajouter un attribut ou une classe visuelle ;
-- éventuellement afficher un badge `IBS` ou `FODMAP`.
+- ajouter un style visuel ;
+- éventuellement afficher un badge de risque ;
+- afficher les ingrédients problématiques au survol ou via panneau d'info.
 
-## 9. Menu flottant d'export
+## 10. Affichage des ingrédients problématiques en anglais / français
 
-### 9.1. But du menu
+Le site est en japonais, donc il faut afficher les informations de façon bilingue ou multilingue :
+- `にんにく / garlic / ail`
+- `りんご / apple / pomme`
+- `ネギ / onion / oignon`
+
+Cela aide à repérer très vite la cause du risque FODMAP, même si le produit affiche uniquement le nom japonais.
+
+## 11. Menu flottant d'export
+
+### 11.1. But du menu
 
 Le menu doit permettre rapidement :
 - exporter les données locales de compatibilité ;
 - importer un JSON ;
 - vider la base locale ;
-- vérifier le nombre d'entrées stockées.
+- vérifier le nombre d'entrées stockées ;
+- afficher les éléments à risque.
 
-### 9.2. Positionnement
+### 11.2. Positionnement
 
 - `position: fixed`
 - `bottom: 16px; right: 16px;`
-- petite icône flottante à gauche du bouton principal
+- petite icône flottante, puis menu au clic
 
-### 9.3. Actions minimales
+### 11.3. Actions minimales
 
 - bouton `Export JSON`
 - bouton `Import JSON`
-- bouton `Clear local storage`
+- bouton `Clear local DB`
 - bouton `Stats`
 
-## 10. Persistance et sécurité
+## 12. Stratégie de stockage et de génération
 
-- Les données sont stockées dans le navigateur, pas chez un tiers.
-- Les données doivent rester portables via export JSON.
-- Le script ne doit pas envoyer de données sensibles à un serveur externe.
-- Le stockage local doit être découpé par clé afin de garder les données lisibles.
+### 12.1. Stockage produit local
 
-## 11. Étapes de conception détaillées
+Le stockage des produits analysés doit être séparé de la base de référence. La base de référence est une donnée “dictionnaire”, tandis que les produits analysés sont des résultats d'un cas réel.
+
+### 12.2. Base embarquée pré-générée
+
+Le meilleur format pour embarquer la base de référence dans le projet est :
+- fichier JSON modifiable ;
+- éventuellement version CSV pour traitement externe ;
+- éventuellement un JSON compact et minifié pour charge rapide.
+
+Recommandation :
+- `data/fodmap_reference.json` comme source de vérité ;
+- `IndexedDB` pour les données runtime du navigateur.
+
+### 12.3. Pourquoi ne pas tout mettre directement dans le userscript
+
+Placer toute la base directement dans le script présente des inconvénients :
+- fichier beaucoup trop dense ;
+- difficile à modifier sans recharger l'extension ;
+- moins lisible et moins maintenable ;
+- plus difficile à exporter.
+
+La bonne séparation est :
+- script logique + parsing ;
+- fichier de base FODMAP séparé ;
+- stockage navigateur runtime persistant.
+
+## 13. Étapes de conception détaillées
 
 ### Étape 1 — Reproduire le contexte réel
 
@@ -252,81 +341,98 @@ Le menu doit permettre rapidement :
 
 - vérifier comment San-A encode le `item_code` ;
 - trouver le lien produit ;
-- tester la récupération depuis `document.body.innerHTML` et DOM.
+- tester la récupération depuis DOM et HTML.
 
-### Étape 3 — Créer le module de stockage
+### Étape 3 — Construire le référentiel FODMAP japonais
 
-- définir la clé `sanA_ibs_db_v1` ;
-- définir `readStorage()`, `writeStorage()`, `mergeProduct()`.
+- lister les aliments courants au Japon ;
+- inclure les noms japonais, anglais et français ;
+- classer par groupe FODMAP ;
+- générer le fichier JSON.
 
-### Étape 4 — Construire le moteur de classification
+### Étape 4 — Créer le module de stockage
+
+- initialiser IndexedDB ;
+- définir stores `reference`, `products`, `analysis` ;
+- définir `readDb()`, `writeDb()`, `mergeProduct()`.
+
+### Étape 5 — Construire le moteur de classification
 
 - normaliser le nom ;
-- extraire les mots-clés IBS/FODMAP ;
-- associer les mots-clés à un type ;
+- extraire les ingrédients ;
+- extraire les mots-clés ;
+- faire le match avec la base locale ;
 - produire un score de compatibilité.
 
-### Étape 5 — Branchements visuels
+### Étape 6 — Branchements visuels
 
 - repérer le conteneur de carte ;
-- ajouter un fond couleur ;
-- ou ajouter une badge ;
+- ajouter le fond coloré ;
+- ou ajouter un badge ;
 - ou ajouter un tooltip explicatif.
 
-### Étape 6 — Ajouter le menu utilisateur
+### Étape 7 — Ajouter le menu utilisateur
 
 - petite icône ;
 - panneau de commandes ;
-- export JSON.
+- export JSON ;
+- import JSON.
 
-### Étape 7 — Validation sur un magasin réel
+### Étape 8 — Validation sur un magasin réel
 
 - tester sur `SNA_006` ;
-- vérifier les éléments connus ;
-- corriger le match sur les produits à forte valeur FODMAP ;
-- enrichir la base locale de manuellement validé.
+- vérifier les résultats sur les aliments connus ;
+- corriger les faux positifs / négatifs ;
+- enrichir la base locale.
 
-## 12. Plan d'implémentation
+## 14. Plan d'implémentation
 
 ### Phase 1 — lecteur de page
 - extraction `item_code`
-- extraction `name`
+- extraction `name_ja`
 - détection de type de page
 
-### Phase 2 — stockage local
-- JSON localStorage
-- clé par `item_code`
+### Phase 2 — base FODMAP et référentiel
+- création du fichier de référence `data/fodmap_reference.json`
+- organisation par ingredient / appareil de nommage
+- alias japonais, français et anglais
+
+### Phase 3 — stockage local
+- IndexedDB / stores
 - export / import / nettoyage
 
-### Phase 3 — moteur de scoring
+### Phase 4 — moteur de scoring
 - analyse du nom
+- analyse des ingrédients
 - analyse de la fiche détaillée
-- calcul de niveau
+- calcul du niveau de risque
 
-### Phase 4 — rendu visuel
+### Phase 5 — rendu visuel
 - fond de carte
 - badge d'état
-- panneau flottant
+- affichage des ingrédients problématiques
 
-### Phase 5 — validation
+### Phase 6 — validation
 - tests sur un magasin cible
 - revue des faux positifs / faux négatifs
-- enrichissement de la base
+- enrichissement de la base de référence
 
-## 13. Problèmes connus et points de vigilance
+## 15. Problèmes connus et points de vigilance
 
 - Le site peut charger le contenu dynamique ou via JS.
-- Les informations nutritionnelles ne sont pas forcément présentes dans la page listée.
+- Les informations nutritionnelles ne sont pas forcément présentes dans les pages listées.
 - La sélection du magasin est obligatoire pour accéder aux pages détaillées.
-- Les valeurs FODMAP doivent rester humaines et auditables.
+- Les données FODMAP sont semi-subjectives et doivent rester humaines, auditables et documentées.
+- Le projet ne remplace pas un avis médical professionnel.
 
-## 14. Conclusion
+## 16. Conclusion
 
 La solution la plus robuste consiste à combiner :
-- extraction de données depuis les pages San-A ;
-- base locale dans le navigateur ;
-- logique de score IBS/FODMAP simple et lisible ;
-- rendu visuel immédiat sur les cartes produits ;
-- export JSON pour traitement hors navigateur.
+- une base de référence FODMAP japonaise pré-générée ;
+- un stockage persistant navigateur avec IndexedDB ;
+- des alias de produits en Japonais / Anglais / Français ;
+- un matching produit + ingrédients + détails ;
+- un rendu visuel immédiat sur les cartes ;
+- un export JSON pour archiver les référentiels personnels.
 
-Cette approche est légère, portable, et bien adaptée à un usage personnel de tri et d'analyse de produits.
+Cette architecture donne un bon équilibre entre lisibilité, volume, persistance et extensibilité, tout en restant compatible avec un usage personnel et local.

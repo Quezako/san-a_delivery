@@ -1,0 +1,213 @@
+{
+  "schema": "fodmap_rules_v1",
+  "entries": [
+    {
+      "food_id": "apple",
+      "fodmap_group": "fructose",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "pear",
+      "fodmap_group": "fructose",
+      "fodmap_level": "moderate",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "watermelon",
+      "fodmap_group": "fructose",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "mango",
+      "fodmap_group": "fructose",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "garlic",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "onion",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "shallot",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "leek",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "asparagus",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "wheat",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "rye",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "barley",
+      "fodmap_group": "fructan",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "milk",
+      "fodmap_group": "lactose",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "yogurt",
+      "fodmap_group": "lactose",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "soft_cheese",
+      "fodmap_group": "lactose",
+      "fodmap_level": "moderate",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "chickpea",
+      "fodmap_group": "gos",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "lentil",
+      "fodmap_group": "gos",
+      "fodmap_level": "high",
+      "is_fodmap": true,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "beans",
+      "fodmap_group": "gos",
+      "fodmap_level": "moderate",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "cauliflower",
+      "fodmap_group": "fructan",
+      "fodmap_level": "moderate",
+      "is_fodmap": true,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "mushroom",
+      "fodmap_group": "unknown",
+      "fodmap_level": "unknown",
+      "is_fodmap": false,
+      "confidence": "low",
+      "source": "curated_local"
+    },
+    {
+      "food_id": "rice",
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "is_fodmap": false,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "potato",
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "is_fodmap": false,
+      "confidence": "high",
+      "source": "monash"
+    },
+    {
+      "food_id": "tomato",
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "is_fodmap": false,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "spinach",
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "is_fodmap": false,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "banana",
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "is_fodmap": false,
+      "confidence": "medium",
+      "source": "monash"
+    },
+    {
+      "food_id": "kiwi",
+      "fodmap_group": "none",
+      "fodmap_level": "low",
+      "is_fodmap": false,
+      "confidence": "medium",
+      "source": "monash"
+    }
+  ]
+}

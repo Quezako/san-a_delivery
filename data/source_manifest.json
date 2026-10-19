@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-10-19",
+  "project": "san-a_delivery",
+  "source_references": [
+    {
+      "name": "Monash University FODMAP app",
+      "kind": "medical_reference",
+      "url": "https://www.monashfodmap.com/",
+      "notes": "Reference on common FODMAP trigger foods and food groups."
+    },
+    {
+      "name": "Darius Kazemi / corpora (food names)",
+      "kind": "food_corpus",
+      "url": "https://github.com/dariusk/corpora/tree/master/data/foods",
+      "notes": "General food nomenclature corpus used as a naming baseline."
+    },
+    {
+      "name": "Japanese supermarket ingredient vocabulary",
+      "kind": "curated_local",
+      "url": "internal",
+      "notes": "Curated list of common Japanese food names and ingredient aliases used in the San-A context."
+    }
+  ]
+}
