@@ -6,6 +6,7 @@
 // @author       Copilot
 // @match        https://netsuper.san-a.co.jp/shop/*
 // @grant        none
+// @require      https://raw.githubusercontent.com/Quezako/san-a_delivery/refs/heads/master/src/fodmap_reference_embed.js
 // ==/UserScript==
 
 (() => {
@@ -114,6 +115,29 @@
     return document.title || '';
   }
 
+  function getRelevantPageText() {
+    const pageType = detectPageType();
+    const markers = ['材料', '原材料', '成分', '商品説明', 'ingredients', 'ingredient', 'composition', 'description'];
+    const candidateNodes = Array.from(document.querySelectorAll('p, li, div, td, th, span, h2, h3'));
+    const fragments = [];
+    const seen = new Set();
+
+    for (const node of candidateNodes) {
+      const rawText = (node.textContent || '').trim();
+      if (!rawText) continue;
+      const haystack = rawText.toLowerCase();
+      const hasMarker = markers.some((marker) => rawText.includes(marker) || haystack.includes(marker.toLowerCase()));
+      if (!hasMarker) continue;
+      if (seen.has(rawText)) continue;
+      seen.add(rawText);
+      fragments.push(rawText);
+    }
+
+    const ingredientText = fragments.join('\n');
+    if (pageType === 'detail' && ingredientText) return ingredientText;
+    return document.body ? document.body.innerText : '';
+  }
+
   function findReferenceMatches(text) {
     if (!text || !Object.keys(REFERENCE_DATA).length) {
       return [];
@@ -190,9 +214,11 @@
   }
 
   function getCardCandidates() {
-    return Array.from(document.querySelectorAll('[data-item-code], [data-product-id], .item-card, .product-card, .product-item, .goods-card, li')).filter((node) => {
+    return Array.from(document.querySelectorAll('a[href*="item_code="], a[href*="itemCode="], [data-item-code], [data-product-id], .item-card, .product-card, .product-item, .goods-card')).filter((node) => {
       const attr = node.getAttribute('data-item-code') || node.getAttribute('data-product-id');
-      return !!attr || node.querySelector('a[href*="item_code="]');
+      if (attr) return true;
+      if (node.matches('a[href*="item_code="]') || node.matches('a[href*="itemCode="]')) return true;
+      return !!node.querySelector('a[href*="item_code="]') || !!node.querySelector('a[href*="itemCode="]');
     });
   }
 
@@ -231,7 +257,8 @@
     if (!itemCode) return;
 
     const name = getProductName();
-    const text = `${name}\n${document.body.innerText || ''}`;
+    const detailText = getRelevantPageText();
+    const text = `${name}\n${detailText || ''}`;
     const result = analyzeTextForMatches(text);
 
     persistAnalysis(itemCode, {
