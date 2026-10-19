@@ -381,6 +381,16 @@ def write_json(path: Path, payload: Any) -> None:
         handle.write("\n")
 
 
+def write_userscript_embed(path: Path, entries: Dict[str, Dict[str, Any]]) -> None:
+    payload = {
+        "schema": "fodmap_reference_v1",
+        "entries": entries,
+    }
+    js = "globalThis.SAN_A_FODMAP_REFERENCE = " + json.dumps(payload, ensure_ascii=False, indent=2) + ";\n"
+    js += "if (typeof module !== 'undefined') { module.exports = globalThis.SAN_A_FODMAP_REFERENCE; }\n"
+    path.write_text(js, encoding="utf-8")
+
+
 def main() -> None:
     source_manifest = {
         "generated_at": "2026-10-19",
@@ -405,11 +415,13 @@ def main() -> None:
     write_json(DATA_DIR / "foods_table.json", foods_table)
     write_json(DATA_DIR / "fodmap_rules.json", fodmap_rules)
     write_json(DATA_DIR / "fodmap_reference.json", runtime_reference)
+    write_userscript_embed(ROOT / "src" / "fodmap_reference_embed.js", runtime_reference["entries"])
 
     print(f"Generated reference files in {DATA_DIR}")
     print(f"Foods: {len(FOODS_TABLE)}")
     print(f"FODMAP rules: {len(FODMAP_RULES)}")
     print(f"Merged runtime entries: {len(runtime_reference['entries'])}")
+    print(f"Userscript embed: {ROOT / 'src' / 'fodmap_reference_embed.js'}")
 
 
 if __name__ == "__main__":
